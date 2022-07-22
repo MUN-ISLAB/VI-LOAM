@@ -66,7 +66,7 @@ Configure sensor parameters in the .yaml files in the ```config``` folder.
 
 2. Run the launch file:
 ```
-roslaunch viloam run.launch
+roslaunch lvi_sam run.launch
 ```
 
 3. Play existing bag files:
