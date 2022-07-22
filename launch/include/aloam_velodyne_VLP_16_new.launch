@@ -1,0 +1,25 @@
+<launch>
+    
+    <param name="scan_line" type="int" value="16" />
+
+    <!-- if 1, do mapping 10 Hz, if 2, do mapping 5 Hz. Suggest to use 1, it will adjust frequence automaticlly -->
+    <param name="mapping_skip_frame" type="int" value="1" />
+
+    <!-- remove too closed points -->
+    <param name="minimum_range" type="double" value="0.3"/>
+    <!-- remap from="/velodyne_points" to="/scan"/-->  <!--- this was the topic used in sync bags -->
+    <remap from="/velodyne_points" to="/lvi_sam/lidar/deskew/cloud_deskewed"/> <!--- this is the deskew topic from lvi -->
+   
+    <param name="mapping_line_resolution" type="double" value="0.2"/>
+    <param name="mapping_plane_resolution" type="double" value="0.4"/>
+
+    <node pkg="lvi_sam" type="gscanRegistration" name="gscanRegistration" output="screen" />
+
+    <node pkg="lvi_sam" type="glaserOdometry" name="glaserOdometry" output="screen" respawn="true" />
+
+    <node pkg="lvi_sam" type="glaserMapping" name="glaserMapping" output="screen" />
+
+    <node pkg="lvi_sam" type="gGPStoPosenode" name="gGPStoPosenode" output="screen" />
+
+
+</launch>
