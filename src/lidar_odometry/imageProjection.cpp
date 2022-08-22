@@ -1,5 +1,5 @@
 #include "utility.h"
-#include "lvi_sam/cloud_info.h"
+#include "vi_loam/cloud_info.h"
 
 // Velodyne
 struct PointXYZIRT
@@ -79,7 +79,7 @@ private:
     float odomIncreY;
     float odomIncreZ;
 
-    lvi_sam::cloud_info cloudInfo;
+    vi_loam::cloud_info cloudInfo;
     double timeScanCur;
     double timeScanNext;
     std_msgs::Header cloudHeader;
@@ -94,7 +94,7 @@ public:
         subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>(pointCloudTopic, 5, &ImageProjection::cloudHandler, this, ros::TransportHints().tcpNoDelay());
 
         pubExtractedCloud = nh.advertise<sensor_msgs::PointCloud2> (PROJECT_NAME + "/lidar/deskew/cloud_deskewed", 5);
-        pubLaserCloudInfo = nh.advertise<lvi_sam::cloud_info>      (PROJECT_NAME + "/lidar/deskew/cloud_info", 5);
+        pubLaserCloudInfo = nh.advertise<vi_loam::cloud_info>      (PROJECT_NAME + "/lidar/deskew/cloud_info", 5);
 
         allocateMemory();
         resetParameters();

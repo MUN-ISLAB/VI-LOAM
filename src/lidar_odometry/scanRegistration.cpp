@@ -49,7 +49,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
-#include "lvi_sam/cloud_info.h"
+#include "vi_loam/cloud_info.h"
 
 using std::atan2;
 using std::cos;

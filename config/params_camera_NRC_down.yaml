@@ -1,7 +1,7 @@
 %YAML:1.0
 
 # Project
-project_name: "lvi_sam"
+project_name: "vi_loam"
 
 #common parameters
 imu_topic: "/imu/data"

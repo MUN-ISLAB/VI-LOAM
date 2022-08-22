@@ -1,14 +1,14 @@
 <launch>
 
     <!--- Robot State TF -->
-    <!-- include file="$(find lvi_sam)/launch/include/module_robot_state_publisher.launch" /-->
+    <!-- include file="$(find vi_loam)/launch/include/module_robot_state_publisher.launch" /-->
 
     <!--- Run Rviz-->
-    <include file="$(find lvi_sam)/launch/include/module_rviz.launch" />
+    <include file="$(find vi_loam)/launch/include/module_rviz.launch" />
 
     <!--- SAM -->
-    <include file="$(find lvi_sam)/launch/include/payload_sam_down_NRC.launch" />
+    <include file="$(find vi_loam)/launch/include/payload_sam_down_NRC.launch" />
 
     <!--- LOAM -->
-    <include file="$(find lvi_sam)/launch/include/aloam_velodyne_VLP_16_new.launch" />
+    <include file="$(find vi_loam)/launch/include/aloam_velodyne_VLP_16_new.launch" />
 </launch>
