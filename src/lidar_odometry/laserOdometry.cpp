@@ -267,9 +267,9 @@ int main(int argc, char **argv)
 
     ros::Subscriber subLaserCloudFullRes = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_2", 100, laserCloudFullResHandler);
 
-    ros::Subscriber subVinsOdometryTime = nh.subscribe<nav_msgs::Odometry>("lvi_sam/vins/odometry/odometry", 100, VinsOdometryHandler);        //D
+    //ros::Subscriber subVinsOdometryTime = nh.subscribe<nav_msgs::Odometry>("lvi_sam/vins/odometry/odometry", 100, VinsOdometryHandler);        //D
 
-    //ros::Subscriber subVinsOdometryTime = nh.subscribe<nav_msgs::Odometry>("vins_estimator/odometry", 100, VinsOdometryHandler);        Stand-alone VINS-Mono integration //D
+    ros::Subscriber subVinsOdometryTime = nh.subscribe<nav_msgs::Odometry>("vins_estimator/odometry", 100, VinsOdometryHandler);        //Stand-alone VINS-Mono integration //D
 
     //ros::Subscriber subVinsOdometryTime = nh.subscribe<nav_msgs::Odometry>("lvi_sam/vins/odometry/imu_propagate", 2000, VinsOdometryHandler);        //D
 
