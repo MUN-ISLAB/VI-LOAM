@@ -49,7 +49,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
-#include "lvi_sam/cloud_info.h"
+#include "vi_loam/cloud_info.h"
 
 using std::atan2;
 using std::cos;
@@ -473,11 +473,11 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_points", 100, laserCloudHandler);				//Payload dataset LIDAR cloud //D
+    //ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_points", 100, laserCloudHandler);				//Payload dataset LIDAR cloud //D
     //ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/kitti/velo/pointcloud", 100, laserCloudHandler);   			//KITTI dataset LIDAR cloud //D
 
     //ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("lvi_sam/lidar/deskew/cloud_deskewed", 100, laserCloudHandler);   		//Deskewd LIDAR cloud from Image Projection node//D
-    //ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/points_raw", 100, laserCloudHandler);   					//LVI-SAM dataset LIDAR raw cloud//D
+    ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>("/points_raw", 100, laserCloudHandler);   					//LVI-SAM dataset LIDAR raw cloud//D
 
     pubLaserCloud = nh.advertise<sensor_msgs::PointCloud2>("/velodyne_cloud_2", 100);
 

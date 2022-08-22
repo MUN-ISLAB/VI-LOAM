@@ -1,7 +1,7 @@
 # project name
-PROJECT_NAME: "lvi_sam"
+PROJECT_NAME: "vi_loam"
 
-lvi_sam:
+vi_loam:
 
   # Topics
   pointCloudTopic: "/velodyne_points"               # Point cloud data

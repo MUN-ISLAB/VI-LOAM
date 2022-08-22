@@ -1,10 +1,10 @@
 <launch>
 
-    <arg name="project" default="lvi_sam"/>
+    <arg name="project" default="vi_loam"/>
     <!-- Lidar odometry param -->
-    <rosparam file="$(find lvi_sam)/config/params_lidar_NRC_down.yaml" command="load" />
+    <rosparam file="$(find vi_loam)/config/params_lidar_NRC_down.yaml" command="load" />
     <!-- VINS config -->
-    <param name="vins_config_file" type="string" value="$(find lvi_sam)/config/params_camera_NRC_down.yaml" />
+    <param name="vins_config_file" type="string" value="$(find vi_loam)/config/params_camera_NRC_down.yaml" />
     
     <!-- Lidar odometry -->
      

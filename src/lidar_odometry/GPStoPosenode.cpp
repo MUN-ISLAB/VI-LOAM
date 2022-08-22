@@ -14,7 +14,7 @@
 #include <tf/transform_listener.h>
 #include <eigen3/Eigen/Geometry>
 #include <sensor_msgs/NavSatFix.h>
-#include </home/didula/GVLOAM_MUN/src/src/lidar_odometry/geodetic_conv.hpp>
+#include "geodetic_conv.hpp"
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/PointStamped.h>
 #include <std_msgs/Float64.h>
@@ -29,7 +29,6 @@ bool initGPS=false;
 double x, y, z;
 double tempx, tempy, tempz;
 int GTframeCount = 0;
-int GPS_status=2;
 
 Eigen::Quaterniond vins_w_q_init(1, 0, 0, 0);
 Eigen::Vector3d vins_w_t_init(0, 0, 0);
@@ -45,7 +44,6 @@ Eigen::Vector3d q_world_locurr_vec;
 Eigen::Quaterniond q_wodom_curr;
 
 Eigen::Matrix4d VELO_T_GPSx;
-Eigen::Matrix4d VELO_T_GPSyy;
 Eigen::Matrix4d VELO_T_GPSy;
 Eigen::Matrix4d VELO_T_GPSz;
 Eigen::Matrix4d VELO_T_GPS;
@@ -62,9 +60,7 @@ Eigen::Vector3d GT;
 //double angle=-23;		           //Handheld - no depth
 
 //double angle=-1;		           //Payload-down-lighthouse
-//double angle=128;		           //Mun_loop_lc
-double angle=-130;		           //Bell412-1
-//double angle=-130;		           //Bell412-3
+double angle=128;		           //Mun_loop_lc
 
 #define PI 3.14159265
 
@@ -79,7 +75,7 @@ Eigen::Quaterniond q_lo_curr;
 
 void GPSHandler(const sensor_msgs::NavSatFixConstPtr& msg)
 {
-
+  
   if (msg->status.status < sensor_msgs::NavSatStatus::STATUS_FIX) 
   {
     	ROS_WARN_STREAM_THROTTLE(1, "No GPS fix");
@@ -108,54 +104,36 @@ void GPSHandler(const sensor_msgs::NavSatFixConstPtr& msg)
 		     sin(angle*PI/180), cos(angle*PI/180), 0, 0,
 	             0, 0, 1, 0,
 		     0, 0, 0, 1;
-	VELO_T_GPSy<< cos(180*PI/180), 0, sin(180*PI/180), 0,
+	VELO_T_GPSy<< cos(90*PI/180), 0, sin(90*PI/180), 0,
 		     0, 1, 0, 0,	
-		     -sin(180*PI/180), 0, cos(180*PI/180), 0,
-		     0, 0, 0, 1;
-
-	VELO_T_GPSyy<< cos(-90*PI/180), 0, sin(-90*PI/180), 0,
-		     0, 1, 0, 0,	
-		     -sin(-90*PI/180), 0, cos(-90*PI/180), 0,
+		     -sin(90*PI/180), 0, cos(90*PI/180), 0,
 		     0, 0, 0, 1;
 
 	VELO_T_GPSx<< 1,0,0,0,
-		      0, cos(180*PI/180), -sin(180*PI/180), 0,
-		      0, sin(180*PI/180), cos(180*PI/180), 0,
+		      0, cos(90*PI/180), -sin(90*PI/180), 0,
+		      0, sin(90*PI/180), cos(90*PI/180), 0,
 		      0, 0, 0, 1;
 	
 
 	//t_error<< 10,6,0;      //mun_loop_lc
 	t_error<< 0,0,0;      //others
 	
-	//LVI-SAM
-	//VELO_T_GPS=VELO_T_GPSz*VELO_T_GPSy;
-
-	//Payload front
+	//LVI-SAM & Payload front
 	//VELO_T_GPS=VELO_T_GPSz*VELO_T_GPSy;
 	
 	//Payload down
-	VELO_T_GPS=VELO_T_GPSyy*VELO_T_GPSz;
+	VELO_T_GPS=VELO_T_GPSy*VELO_T_GPSz;
 
    	GT=VELO_T_GPS.block<3, 3>(0, 0)*temp+t_error;
 
-	//Transform to Lidar frame - Payload Down
+	//Transform to Lidar frame 
 	tempx=GT[0];			//ToDo: Find the correct calibration 
-	tempy=-GT[1];
+	tempy=GT[1];
 	tempz=GT[2];
 
-	//Transform to Lidar frame - LVI
-	//tempx=GT[0];			
-	//tempy=GT[1];
-	//tempz=GT[2];
 
-
-	GPS_status=msg->status.status;
   }
-	
 
- if(GPS_status<2)
- {
-	//std::cout <<"-------GPS_status= "<<GPS_status<< std::endl;
         // publish Ground truth path
         geometry_msgs::PoseStamped pose_stamped;
         pose_stamped.header = msg->header;
@@ -170,7 +148,6 @@ void GPSHandler(const sensor_msgs::NavSatFixConstPtr& msg)
         GPSpath.header.frame_id = "/odom";
         GPSpath.poses.push_back(pose_stamped);
         pubGPSpath.publish(GPSpath);
-  }
 
 	
 	
@@ -367,9 +344,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
 
-    ros::Subscriber sub_GPS = nh.subscribe("/fix", 100, GPSHandler);           //D - Payload GPS topic
+    ros::Subscriber sub_GPS = nh.subscribe("/fix", 100, GPSHandler);
     
-    //ros::Subscriber sub_GPS = nh.subscribe("/gps/fix", 100, GPSHandler);     //D - LVI-SAM GPS topic
+    //ros::Subscriber sub_GPS = nh.subscribe("/gps/fix", 100, GPSHandler);
 
     ros::Subscriber subVinsOdometry = nh.subscribe<nav_msgs::Odometry>("vins_estimator/odometry", 100, VinsOdometryHandler);
     
