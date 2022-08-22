@@ -9,8 +9,6 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g -pthread")
 SET(OpenCV_DIR /home/didula/installation/OpenCV-3.4.4/installation/OpenCV-3.4.4/share/OpenCV)
 
-add_subdirectory(./src/global_fusion/ThirdParty/GeographicLib/)
-
 ######################
 ### Packages
 ######################
@@ -73,7 +71,6 @@ include_directories(
     ${CERES_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
     ${GTSAM_INCLUDE_DIR}
-    ./src/global_fusion/ThirdParty/GeographicLib/include/
 )
 
 link_directories(
@@ -133,18 +130,6 @@ target_link_libraries(glaserMapping ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES
 
 add_executable(gGPStoPosenode src/lidar_odometry/GPStoPosenode.cpp)
 target_link_libraries(gGPStoPosenode ${catkin_LIBRARIES})
-
-######################
-### Global Fusion
-######################
-add_executable(global_fusion_node 
-	src/global_fusion/globalOptNode.cpp
-	src/global_fusion/globalOpt.cpp)
-
-target_link_libraries(global_fusion_node ${catkin_LIBRARIES} ${CERES_LIBRARIES} libGeographiccc) 
-
-
-
 # IMU Preintegration
 #add_executable(${PROJECT_NAME}_imuPreintegration src/lidar_odometry/imuPreintegration.cpp)
 #target_link_libraries(${PROJECT_NAME}_imuPreintegration ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} gtsam)
