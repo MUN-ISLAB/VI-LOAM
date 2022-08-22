@@ -189,10 +189,6 @@ Eigen::Matrix4d CAM_T_IMU;
 Eigen::Matrix4d IMU_T_CAM;
 Eigen::Matrix4d VELO_T_IMU;
 Eigen::Matrix4d VELO_T_GPS;
-Eigen::Matrix4d VELO_T_GPSx;
-Eigen::Matrix4d VELO_T_GPSy;
-Eigen::Matrix4d VELO_T_GPSyy;
-Eigen::Matrix4d VELO_T_GPSz;
 
 Eigen::Quaterniond q_vo_ff;             	
 Eigen::Vector3d t_vo_ff;
@@ -214,10 +210,9 @@ Eigen::Vector3d GPS_corrected;
 double GPS_time=0;
 double GPS_accuracy;
 #define PI 3.14159265
-double angle=-130;
+double angle=-80;
 Eigen::Matrix4d WL_T_WGPS = Eigen::Matrix4d::Identity();
 int GPScount = 0; 
-int GPS_status=2;
 
 // set initial guess
 void transformAssociateToMap()
@@ -463,26 +458,6 @@ void process()
         
 		VELO_T_IMU=Param.VELO_T_IMU;
 
-		VELO_T_GPSz<< cos(angle*PI/180), -sin(angle*PI/180), 0, 0,
-			     sin(angle*PI/180), cos(angle*PI/180), 0, 0,
-			     0, 0, 1, 0,
-			     0, 0, 0, 1;
-		VELO_T_GPSy<< cos(180*PI/180), 0, sin(180*PI/180), 0,
-			     0, 1, 0, 0,	
-			     -sin(180*PI/180), 0, cos(180*PI/180), 0,
-			     0, 0, 0, 1;
-		VELO_T_GPSyy<< cos(-90*PI/180), 0, sin(-90*PI/180), 0,
-			     0, 1, 0, 0,	
-			     -sin(-90*PI/180), 0, cos(-90*PI/180), 0,
-			     0, 0, 0, 1;
-
-		//LVI-SAM and Payload front
-		//VELO_T_GPS=VELO_T_GPSz*VELO_T_GPSy;
-	
-		//Payload down
-		VELO_T_GPS=VELO_T_GPSyy*VELO_T_GPSz;
-
-
 		//std::cout <<"-------VELO_T_IMU lidar Mapping-------- "<<VELO_T_IMU<< std::endl;
 
         	/*VELO_T_GPS << cos(angle*PI/180), -sin(angle*PI/180), 0, 0,
@@ -624,16 +599,16 @@ void process()
 				vins_w_q.z() = visualOdometryBuf.front()->pose.pose.orientation.z;
 			    	vins_w_q.w() = visualOdometryBuf.front()->pose.pose.orientation.w;
 			}
-			ROS_INFO("\n -------------Mapping Lidar_time =, %f", timeLaserOdometry);
+			///ROS_INFO("\n -------------Mapping Lidar_time =, %f", timeLaserOdometry);
 
-			if(!GPSbuff.empty())
+			/*if(!GPSbuff.empty())
 			{
 
 			  for(int i = 0; i < (signed)GPSbuff.size(); ++i)
      			  {
 
 			    	GPS_time=GPSbuff.front()->header.stamp.toSec();
-				ROS_INFO("\n -------------GPS_time =, %f", GPS_time);
+				//ROS_INFO("\n -------------GPS_time =, %f", GPS_time);
 				if(fabs(GPS_time-timeLaserOdometry)<0.1	)
 				{
 					GPS_fail=false;		
@@ -641,11 +616,10 @@ void process()
 					longitude=GPSbuff.front()->longitude;
 					altitude=GPSbuff.front()->altitude;
 					GPS_accuracy = GPSbuff.front()->position_covariance[0];
-					GPS_status=GPSbuff.front()->status.status;
 
 					g_geodetic_converter.geodetic2Enu(latitude, longitude, altitude, &x, &y, &z);
-					GPS_position<<x,y,z; 
-					std::cout <<"-------GPS_position----- "<<GPS_position<< std::endl; 
+					GPS_position<<x,y,z;				
+					//std::cout <<"-------GPS_position----- "<<GPS_position<< std::endl; 
 					//ROS_INFO("\n -------------GPS correction---------");
 					GPSbuff.pop();
 					break;
@@ -663,8 +637,8 @@ void process()
 			  }
 			}
 
-			GPS_corrected=VELO_T_GPS.block<3, 3>(0, 0) * GPS_position + VELO_T_GPS.block<3, 1>(0, 3);
-			std::cout <<"-------GPS_corrected----- "<<GPS_corrected<< std::endl; 
+			GPS_corrected=WL_T_WGPS.block<3, 3>(0, 0) * GPS_position + WL_T_WGPS.block<3, 1>(0, 3);
+			std::cout <<"-------GPS_corrected----- "<<GPS_corrected<< std::endl; */
 
 			/*std::cout <<"-------vins_w_q.x "<<vins_w_q.x()<< std::endl;        
 			std::cout <<"-------vins_w_q.y "<<vins_w_q.y()<< std::endl; 
@@ -1020,10 +994,10 @@ void process()
 					}
 
 
-					if (GPS_Comb && !GPS_fail && GPS_status<2)
+					if (GPS_Comb && !GPS_fail)
 					{
 
-						ceres::CostFunction* gps_function = TError::Create(GPS_corrected.x(), -GPS_corrected.y(), GPS_corrected.z(), 0.01);
+						ceres::CostFunction* gps_function = TError::Create(GPS_corrected.x(), GPS_corrected.y(), GPS_corrected.z(), 0.01);
 						problem.AddResidualBlock(gps_function, loss_function, parameters+4);
 						ROS_INFO("\n -------------GPS correction---------");
 
@@ -1541,9 +1515,7 @@ int main(int argc, char **argv)
 
     	ros::Subscriber subVinsOdometry = nh.subscribe<nav_msgs::Odometry>("visual_odom_last", 100, VinsOdometryHandler);        //Didula - synced visual odometry
         
-	ros::Subscriber sub_GPS = nh.subscribe("/fix", 100, GPSHandler); 	//D - Subscribe to GPS messages
-
-    	//ros::Subscriber sub_GPS = nh.subscribe("/gps/fix", 100, GPSHandler);     //D - LVI-SAM GPS topic
+	ros::Subscriber sub_GPS = nh.subscribe("/fix", 100, GPSHandler); 	//Didula - Subscribe to GPS messages
 
 	pubLaserCloudSurround = nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_surround", 100);
 
