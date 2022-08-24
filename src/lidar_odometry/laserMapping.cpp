@@ -55,7 +55,7 @@
 #include <string>
 
 #include <sensor_msgs/NavSatFix.h>
-#include </home/didula/GVLOAM_MUN/src/src/lidar_odometry/geodetic_conv.hpp>
+#include "geodetic_conv.hpp"
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 
@@ -144,7 +144,7 @@ nav_msgs::Path laserAfterMappedPath;
 //-----------------------------//D
 bool VinsInited=false;
 bool VO_LO_Comb=true;
-bool GPS_Comb=false;
+bool GPS_Comb=true;
 
 bool VO_fail=false;
 bool GPS_fail=false;
