@@ -1,5 +1,4 @@
 // Align GPS frame with navigation frame, November 2021. 
-//Test
 // Author: Didula Dissanayaka - Intelligent Systems Lab, MUN - dissanayakadidula@gmail.com
 
 
